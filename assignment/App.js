@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Constants from 'expo-constants'
 
 const CHOICES = [
@@ -42,10 +42,10 @@ const ChoiceCard = ({ player, choice: { uri, name } }) => {
   );
 };
 
-var stats = {totaltouch: 0, wins: 0, loses: 0, ties: 0, winsRatio: 0, losesRatio: 0, tiesRatio: 0}
+var stats = {totaltouch: 0, wins: 0, loses: 0, ties: 0, winsRatio: '0.00', losesRatio: '0.00', tiesRatio: '0.00'}
 
 export default function App() {
-  const [gamePrompt, setGamePrompt] = useState('Sometimes');
+  const [gamePrompt, setGamePrompt] = useState('Choose your weapon!');
   const [userChoice, setUserChoice] = useState({});
   const [computerChoice, setComputerChoice] = useState({});
   const onPress = playerChoice => {
@@ -64,18 +64,16 @@ export default function App() {
       stats.tiesRatio = 0;
     }
     else{
-      stats.winsRatio = (stats.wins/stats.totaltouch).toFixed(2);
-      stats.losesRatio = (stats.loses/stats.totaltouch).toFixed(2);
-      stats.tiesRatio = (stats.ties/stats.totaltouch).toFixed(2);
+      stats.winsRatio = (stats.wins*100/stats.totaltouch).toFixed(2);
+      stats.losesRatio = (stats.loses*100/stats.totaltouch).toFixed(2);
+      stats.tiesRatio = (stats.ties*100/stats.totaltouch).toFixed(2);
     }
     const newUserChoice = CHOICES.find(choice => choice.name === playerChoice);
     const newComputerChoice = CHOICES.find(choice => choice.name === compChoice);
 
     setGamePrompt(result);
     setUserChoice(newUserChoice);
-    setComputerChoice(newComputerChoice);
-
-    
+    setComputerChoice(newComputerChoice); 
   };
 
   const getRoundOutcome = userChoice => {
@@ -96,13 +94,13 @@ export default function App() {
     return [result, computerChoice];
   };
 
-  const randomComputerChoice = () =>
-  CHOICES[Math.floor(Math.random() * CHOICES.length)];
+  const randomComputerChoice = () => CHOICES[Math.floor(Math.random() * CHOICES.length)];
 
   const getResultColor = () => {
     if (gamePrompt === 'Victory!') return 'green';
     if (gamePrompt === 'Defeat!') return 'red';
     if (gamePrompt === 'Tie game!') return '#250902';
+    if (gamePrompt === 'Choose your weapon!') return 'black';
     return null;
   };
 
@@ -125,15 +123,13 @@ export default function App() {
           <Text style={{color: 'black', fontWeight: "bold", fontSize: 22}}>Ties</Text>
           <Text style={{fontSize: 20}}>{stats.tiesRatio} %</Text>
         </View>
-
-
       </View>
-    <Text style={{ fontSize: 35, color: getResultColor() }}>{gamePrompt}</Text>
-    <View style={styles.choicesContainer}>
-      <ChoiceCard player="Player" choice={userChoice} />
-    <Text style={{ color: '#250902' }}>vs</Text>
-    <ChoiceCard player="Computer" choice={computerChoice} />
-    </View>
+      <Text style={{ fontSize: 35, color: getResultColor() }}>{gamePrompt}</Text>
+      <View style={styles.choicesContainer}>
+        <ChoiceCard player="Player" choice={userChoice} />
+      <Text style={{ color: '#250902' }}>vs</Text>
+      <ChoiceCard player="Computer" choice={computerChoice} />
+      </View>
 
       {CHOICES.map(choice => {
         return (
@@ -146,6 +142,7 @@ export default function App() {
       })}
       <StatusBar style="auto" />
     </View>
+
   );
 }
 
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignSelf: 'stretch',
-    marginBottom: 20
+    marginBottom: 20,
   },
   statsbarelements:{
     alignItems: 'center'
