@@ -42,19 +42,40 @@ const ChoiceCard = ({ player, choice: { uri, name } }) => {
   );
 };
 
+var stats = {totaltouch: 0, wins: 0, loses: 0, ties: 0, winsRatio: 0, losesRatio: 0, tiesRatio: 0}
+
 export default function App() {
   const [gamePrompt, setGamePrompt] = useState('Sometimes');
   const [userChoice, setUserChoice] = useState({});
   const [computerChoice, setComputerChoice] = useState({});
   const onPress = playerChoice => {
     const [result, compChoice] = getRoundOutcome(playerChoice);
-  
+    stats.totaltouch++;
+    if(gamePrompt === 'Victory!')
+      stats.wins++;
+    else if(gamePrompt === 'Defeat!')
+      stats.loses++;
+    else if(gamePrompt === 'Tie game!')
+      stats.ties++;
+    
+    if(stats.totaltouch===0){
+      stats.winsRatio = 0;
+      stats.losesRatio = 0;
+      stats.tiesRatio = 0;
+    }
+    else{
+      stats.winsRatio = (stats.wins/stats.totaltouch).toFixed(2);
+      stats.losesRatio = (stats.loses/stats.totaltouch).toFixed(2);
+      stats.tiesRatio = (stats.ties/stats.totaltouch).toFixed(2);
+    }
     const newUserChoice = CHOICES.find(choice => choice.name === playerChoice);
     const newComputerChoice = CHOICES.find(choice => choice.name === compChoice);
-  
+
     setGamePrompt(result);
     setUserChoice(newUserChoice);
     setComputerChoice(newComputerChoice);
+
+    
   };
 
   const getRoundOutcome = userChoice => {
@@ -87,6 +108,26 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.statsbar}>
+        <View style={styles.statsbarelements}>
+          <Text style={{color: 'black', fontWeight: "bold", fontSize: 22}}>Total</Text>
+          <Text style={{fontSize: 20}}>{stats.totaltouch}</Text>
+        </View>
+        <View style={styles.statsbarelements}>
+          <Text style={{color: 'black', fontWeight: "bold", fontSize: 22}}>Wins</Text>
+          <Text style={{fontSize: 20}}>{stats.winsRatio} %</Text>
+        </View>
+        <View style={styles.statsbarelements}>
+          <Text style={{color: 'black', fontWeight: "bold", fontSize: 22}}>Loses</Text>
+          <Text style={{fontSize: 20}}>{stats.losesRatio} %</Text>
+        </View>
+        <View style={styles.statsbarelements}>
+          <Text style={{color: 'black', fontWeight: "bold", fontSize: 22}}>Ties</Text>
+          <Text style={{fontSize: 20}}>{stats.tiesRatio} %</Text>
+        </View>
+
+
+      </View>
     <Text style={{ fontSize: 35, color: getResultColor() }}>{gamePrompt}</Text>
     <View style={styles.choicesContainer}>
       <ChoiceCard player="Player" choice={userChoice} />
@@ -116,6 +157,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#e9ebee',
     marginTop: Constants.statusBarHeight,
   },
+  statsbar:{
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignSelf: 'stretch',
+    marginBottom: 20
+  },
+  statsbarelements:{
+    alignItems: 'center'
+  },
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -137,15 +187,15 @@ const styles = StyleSheet.create({
   choicesContainer: {
     margin: 10,
     borderWidth: 2,
-    paddingTop: 100,
+    paddingTop: 20,
     shadowRadius: 5,
-    paddingBottom: 100,
+    paddingBottom: 20,
     borderColor: 'grey',
     shadowOpacity: 0.90,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     shadowColor: 'rgba(0,0,0,0.2)',
     shadowOffset: { height: 5, width: 5 },
   },
